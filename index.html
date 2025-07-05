@@ -921,7 +921,14 @@
                 <div class="max-w-4xl mx-auto text-center">
                     <h1 class="text-4xl md:text-5xl font-bold mb-6 animate-glow" style="--accent-blue-neon: #00F0FF;">Aplicativos Florestais</h1>
                     <p class="text-xl md:text-2xl mb-8">Ferramentas desenvolvidas para profissionais do setor madeireiro</p>
-					<p class="text-xl md:text-2xl mb-8">Francisco José (Romaneador & Classificador de Madeiras)</p>
+					<div class="mb-8">
+						<p class="text-3xl md:text-4xl font-bold animate-glow" style="--accent-blue-neon: #00F0FF;">
+							Francisco José
+						</p>
+						<p class="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-1">
+							Romaneador & Classificador de Madeiras
+						</p>
+					</div>
                 </div>
             </section>
 
@@ -1119,11 +1126,29 @@
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4 p-4 bg-gray-900 modal-header">
                 <h2 class="text-4xl font-bold text-blue-400 flex-grow text-center tracking-wider drop-shadow-lg">Gerador de Orçamento</h2>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-200">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
+                <div class="flex gap-2 items-center">
+                    <button id="invoiceClearLogoBtn" class="btn btn-danger hidden text-sm"><i class="fas fa-times mr-1"></i> Remover Logo</button>
+                    <label for="invoiceLogoUpload" class="btn btn-gray cursor-pointer text-sm"><i class="fas fa-image mr-1"></i> Add Logo</label>
+                    <input type="file" id="invoiceLogoUpload" accept="image/*" class="hidden">
+
+                    <label for="invoiceWatermarkUpload" id="invoiceWatermarkUploadLabel" class="btn btn-gray cursor-pointer text-sm"><i class="fas fa-tint mr-1"></i>Marca D'água</label>
+                    <input type="file" id="invoiceWatermarkUpload" accept="image/*" class="hidden">
+                    <button id="invoiceRemoveWatermarkBtn" class="btn btn-gray hidden text-sm"><i class="fas fa-times mr-1"></i> Remover Marca D'água</button>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-200">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
             </div>
             <div class="flex-1 overflow-auto p-2 md:p-6 bg-gray-100 dark:bg-gray-900" id="fatura">
+                <div id="invoiceLogoContainer" class="mb-6 flex justify-start items-center gap-4 hidden animate-fade-in">
+                    <img id="invoiceLogoPreview" class="logo-preview" src="" alt="Logo">
+                </div>
+
+                <div id="invoiceWatermarkPreviewContainer" class="mb-6 flex justify-start items-center gap-4 hidden animate-fade-in">
+                    <span class="text-sm text-gray-600 dark:text-gray-300">Marca D'água:</span>
+                    <img id="invoiceWatermarkPreview" class="watermark-preview-img" src="" alt="Prévia Marca D'água">
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div>
                         <label for="invoice-client" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Cliente</label>
@@ -1159,6 +1184,39 @@
                     </button>
                 </div>
                 <div class="mt-8 border-t border-gray-200 pt-4 dark:border-gray-600">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="invoice-comments" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Dados Externos</label>
+                            <textarea id="invoice-comments" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 input-mobile modal-input" rows="3" placeholder="Insira dados externos que aparecerão no PDF abaixo do nome do cliente"></textarea>
+                        </div>
+                        <div>
+                            <label for="invoice-bank-data" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Dados Bancários</label>
+                            <textarea id="invoice-bank-data" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 input-mobile modal-input" rows="3" placeholder="Ex: PIX: 123.456.789-00, Banco ABC, Ag. 1234, C/C 56789-0"></textarea>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label for="invoice-footer" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Rodapé</label>
+                        <textarea id="invoice-footer" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 input-mobile modal-input" rows="2">Serraria Oliveira - Rodovia BR-230 - Transamazônica, s/n, Estrada São Joaquim, Bairro Liberdade, Altamira/PA</textarea>
+                    </div>
+
+                    <!-- Seção de Assinatura -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Assinatura</label>
+                            <div class="flex items-center gap-2 mb-2">
+                                <label for="invoice-signature-upload" class="btn btn-gray cursor-pointer text-sm"><i class="fas fa-signature mr-1"></i> Adicionar Assinatura</label>
+                                <input type="file" id="invoice-signature-upload" accept="image/*" class="hidden">
+                                <button id="invoice-clear-signature-btn" class="btn btn-danger hidden text-sm"><i class="fas fa-times mr-1"></i> Remover</button>
+                            </div>
+                            <div id="invoice-signature-container" class="hidden mb-2">
+                                <img id="invoice-signature-preview" class="max-h-20 border border-gray-300 rounded" src="" alt="Assinatura">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="invoice-signature-name" class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Nome do Signatário</label>
+                            <input type="text" id="invoice-signature-name" class="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 input-mobile modal-input" placeholder="Nome da pessoa que assina...">
+                        </div>
+                    </div>
                     <div class="flex justify-end">
                         <div class="w-full md:w-1/3 text-gray-700 dark:text-gray-300">
                             <div class="flex justify-between mb-2">
@@ -2100,11 +2158,46 @@
         }
 
         // --- Funções do Gerador de Orçamento (Prefixadas com 'invoice_') ---
+        let invoice_logoDataUrl = null;
+        let invoice_watermarkImageDataUrl = null;
+        let invoice_watermarkImageElement = null;
+        let invoice_signatureDataUrl = null;
+
         function invoice_initializeInvoice() {
             if (document.getElementById('invoice-items').children.length === 0) {
                 invoice_addInvoiceRow();
             }
             invoice_calculateInvoiceTotal(); // Recalcula ao abrir
+            
+            // Adicionar event listeners para logo e marca d'água
+            const logoUpload = document.getElementById('invoiceLogoUpload');
+            const clearLogoBtn = document.getElementById('invoiceClearLogoBtn');
+            const watermarkUpload = document.getElementById('invoiceWatermarkUpload');
+            const removeWatermarkBtn = document.getElementById('invoiceRemoveWatermarkBtn');
+            
+            if (logoUpload) {
+                logoUpload.onchange = invoice_handleLogoUpload;
+            }
+            if (clearLogoBtn) {
+                clearLogoBtn.onclick = invoice_removerLogo;
+            }
+            if (watermarkUpload) {
+                watermarkUpload.onchange = invoice_handleWatermarkUpload;
+            }
+            if (removeWatermarkBtn) {
+                removeWatermarkBtn.onclick = invoice_removerWatermark;
+            }
+            
+            // Event listeners para assinatura
+            const signatureUpload = document.getElementById('invoice-signature-upload');
+            const clearSignatureBtn = document.getElementById('invoice-clear-signature-btn');
+            
+            if (signatureUpload) {
+                signatureUpload.onchange = invoice_handleSignatureUpload;
+            }
+            if (clearSignatureBtn) {
+                clearSignatureBtn.onclick = invoice_removerSignature;
+            }
         }
 
         function invoice_addInvoiceRow() {
@@ -2190,6 +2283,22 @@
             document.getElementById('invoice-date').value = '';
             document.getElementById('invoice-tax').value = '0.00';
             document.getElementById('invoice-discount').value = '0.00';
+            document.getElementById('invoice-comments').value = '';
+            document.getElementById('invoice-bank-data').value = '';
+            document.getElementById('invoice-footer').value = 'Serraria Oliveira - Rodovia BR-230 - Transamazônica, s/n, Estrada São Joaquim, Bairro Liberdade, Altamira/PA';
+            document.getElementById('invoice-signature-name').value = '';
+
+            // Limpar assinatura
+            invoice_signatureDataUrl = null;
+            const signatureContainer = document.getElementById('invoice-signature-container');
+            const signaturePreview = document.getElementById('invoice-signature-preview');
+            const clearSignatureBtn = document.getElementById('invoice-clear-signature-btn');
+            const signatureUpload = document.getElementById('invoice-signature-upload');
+            
+            if (signatureContainer) signatureContainer.classList.add('hidden');
+            if (signaturePreview) signaturePreview.src = '';
+            if (clearSignatureBtn) clearSignatureBtn.classList.add('hidden');
+            if (signatureUpload) signatureUpload.value = '';
 
             const tbody = document.getElementById('invoice-items');
             tbody.innerHTML = '';
@@ -2198,6 +2307,113 @@
             document.getElementById('invoice-subtotal').textContent = 'R$ 0,00';
             document.getElementById('invoice-total').textContent = 'R$ 0,00';
             showToast('Orçamento limpo!', 'success');
+        }
+
+        // Funções para manipular logo e marca d'água
+        function invoice_handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    invoice_logoDataUrl = e.target.result;
+                    const logoContainer = document.getElementById('invoiceLogoContainer');
+                    const logoPreview = document.getElementById('invoiceLogoPreview');
+                    const clearLogoBtn = document.getElementById('invoiceClearLogoBtn');
+                    
+                    logoPreview.src = invoice_logoDataUrl;
+                    logoContainer.classList.remove('hidden');
+                    clearLogoBtn.classList.remove('hidden');
+                    showToast('Logo adicionado com sucesso!', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function invoice_removerLogo() {
+            invoice_logoDataUrl = null;
+            const logoContainer = document.getElementById('invoiceLogoContainer');
+            const logoPreview = document.getElementById('invoiceLogoPreview');
+            const clearLogoBtn = document.getElementById('invoiceClearLogoBtn');
+            const logoUpload = document.getElementById('invoiceLogoUpload');
+            
+            logoPreview.src = '';
+            logoContainer.classList.add('hidden');
+            clearLogoBtn.classList.add('hidden');
+            logoUpload.value = '';
+            showToast('Logo removido!', 'success');
+        }
+
+        function invoice_handleWatermarkUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    invoice_watermarkImageDataUrl = e.target.result;
+                    invoice_watermarkImageElement = new Image();
+                    invoice_watermarkImageElement.src = invoice_watermarkImageDataUrl;
+                    
+                    const watermarkContainer = document.getElementById('invoiceWatermarkPreviewContainer');
+                    const watermarkPreview = document.getElementById('invoiceWatermarkPreview');
+                    const removeWatermarkBtn = document.getElementById('invoiceRemoveWatermarkBtn');
+                    
+                    watermarkPreview.src = invoice_watermarkImageDataUrl;
+                    watermarkContainer.classList.remove('hidden');
+                    removeWatermarkBtn.classList.remove('hidden');
+                    showToast('Marca d\'água adicionada com sucesso!', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function invoice_removerWatermark() {
+            invoice_watermarkImageDataUrl = null;
+            invoice_watermarkImageElement = null;
+            const watermarkContainer = document.getElementById('invoiceWatermarkPreviewContainer');
+            const watermarkPreview = document.getElementById('invoiceWatermarkPreview');
+            const removeWatermarkBtn = document.getElementById('invoiceRemoveWatermarkBtn');
+            const watermarkUpload = document.getElementById('invoiceWatermarkUpload');
+            
+            watermarkPreview.src = '';
+            watermarkContainer.classList.add('hidden');
+            removeWatermarkBtn.classList.add('hidden');
+            watermarkUpload.value = '';
+            watermarkUploadLabel.classList.remove('hidden');
+            romaneio_saveToLocalStorage();
+            showToast('Marca d\'água removida!', 'info');
+        }
+
+        // Funções para manipular assinatura
+        function invoice_handleSignatureUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    invoice_signatureDataUrl = e.target.result;
+                    const signatureContainer = document.getElementById('invoice-signature-container');
+                    const signaturePreview = document.getElementById('invoice-signature-preview');
+                    const clearSignatureBtn = document.getElementById('invoice-clear-signature-btn');
+                    
+                    signaturePreview.src = invoice_signatureDataUrl;
+                    signatureContainer.classList.remove('hidden');
+                    clearSignatureBtn.classList.remove('hidden');
+                    showToast('Assinatura adicionada com sucesso!', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function invoice_removerSignature() {
+            invoice_signatureDataUrl = null;
+            const signatureContainer = document.getElementById('invoice-signature-container');
+            const signaturePreview = document.getElementById('invoice-signature-preview');
+            const clearSignatureBtn = document.getElementById('invoice-clear-signature-btn');
+            const signatureUpload = document.getElementById('invoice-signature-upload');
+            
+            signaturePreview.src = '';
+            signatureContainer.classList.add('hidden');
+            clearSignatureBtn.classList.add('hidden');
+            signatureUpload.value = '';
+            showToast('Assinatura removida!', 'success');
         }
 
         function invoice_showConfirmClearModal() {
@@ -2228,10 +2444,67 @@
             return date.toLocaleDateString('pt-BR');
         }
 
-        function invoice_generateInvoicePDF() {
+        async function invoice_generateInvoicePDF() {
             try {
+                // Verificar se as bibliotecas estão carregadas
+                if (!window.jspdf) {
+                    showToast("Erro: Biblioteca jsPDF não está carregada. Recarregue a página.", 'danger');
+                    return;
+                }
+                
+                // Verificar se o modal está aberto
+                const modal = document.getElementById('invoice-modal');
+                if (!modal || !modal.classList.contains('active')) {
+                    showToast("Erro: Modal do orçamento não está aberto.", 'danger');
+                    return;
+                }
+                
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 15;
+
+                // Adicionar marca d'água como fundo se existir
+                if (invoice_watermarkImageDataUrl) {
+                    let watermarkImg = new Image();
+                    watermarkImg.src = invoice_watermarkImageDataUrl;
+                    await new Promise(resolve => {
+                        watermarkImg.onload = resolve;
+                        watermarkImg.onerror = () => resolve();
+                    });
+                    
+                    // Criar canvas para converter para escala de cinza
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = watermarkImg.width;
+                    canvas.height = watermarkImg.height;
+                    
+                    // Desenhar imagem no canvas
+                    ctx.drawImage(watermarkImg, 0, 0);
+                    
+                    // Converter para escala de cinza
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+                        data[i] = gray;     // Red
+                        data[i + 1] = gray; // Green
+                        data[i + 2] = gray; // Blue
+                        data[i + 3] = data[i + 3] * 0.15; // Alpha (transparência reduzida para 15%)
+                    }
+                    
+                    ctx.putImageData(imageData, 0, 0);
+                    
+                    // Marca d'água ainda menor e centralizada, um pouco mais abaixo
+                    const watermarkWidth = pageWidth * 0.4; // 40% da largura da página
+                    const watermarkHeight = pageHeight * 0.4; // 40% da altura da página
+                    const watermarkX = (pageWidth - watermarkWidth) / 2;
+                    const watermarkY = (pageHeight - watermarkHeight) / 2 + 20; // 20mm mais abaixo
+                    
+                    doc.addImage(canvas, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight, undefined, 'FAST');
+                }
 
                 doc.setProperties({
                     title: `Orçamento ${document.getElementById('invoice-number').value || ''}`,
@@ -2241,6 +2514,32 @@
                     creator: 'Francisco José'
                 });
 
+                // Adicionar logo se existir
+                let logoImg = null;
+                if (invoice_logoDataUrl) {
+                    logoImg = new Image();
+                    logoImg.src = invoice_logoDataUrl;
+                    await new Promise(resolve => {
+                        logoImg.onload = resolve;
+                        logoImg.onerror = () => {
+                            console.warn("Não foi possível carregar a imagem do logo para o PDF.");
+                            logoImg = null;
+                            resolve();
+                        };
+                    });
+                }
+
+
+
+                // Adicionar logo no canto superior direito se existir
+                if (logoImg) {
+                    const logoWidth = 20;
+                    const logoHeight = (logoImg.height * logoWidth) / logoImg.width;
+                    const logoX = pageWidth - margin - logoWidth;
+                    const logoY = margin + 5;
+                    doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+                }
+
                 doc.setFontSize(20);
                 doc.setTextColor(32, 55, 100);
                 doc.text("ORÇAMENTO", 105, 20, { align: 'center' });
@@ -2248,52 +2547,162 @@
                 doc.setFontSize(10);
                 doc.setTextColor(0, 0, 0);
 
-                const clientName = document.getElementById('invoice-client').value || 'Cliente não informado';
-                const invoiceNumber = document.getElementById('invoice-number').value || '---';
-                const invoiceDate = document.getElementById('invoice-date').value || new Date().toISOString().split('T')[0];
+                const clientElement = document.getElementById('invoice-client');
+                const numberElement = document.getElementById('invoice-number');
+                const dateElement = document.getElementById('invoice-date');
+                
+                if (!clientElement || !numberElement || !dateElement) {
+                    showToast("Erro: Elementos básicos do formulário não encontrados.", 'danger');
+                    return;
+                }
+                
+                const clientName = clientElement.value || 'Cliente não informado';
+                const invoiceNumber = numberElement.value || '---';
+                const invoiceDate = dateElement.value || new Date().toISOString().split('T')[0];
 
-                doc.text(`Número: ${invoiceNumber}`, 15, 50);
-                doc.text(`Data: ${invoice_formatDate(invoiceDate)}`, 15, 55);
-                doc.text(`Cliente: ${clientName}`, 15, 60);
+                doc.text(`Número: ${invoiceNumber}`, 15, 35);
+                doc.text(`Data: ${invoice_formatDate(invoiceDate)}`, 15, 40);
+                doc.text(`Cliente: ${clientName}`, 15, 45);
+                
+                // Verificar dados externos e calcular posição da tabela
+                const commentsElement = document.getElementById('invoice-comments');
+                const comments = commentsElement ? commentsElement.value.trim() : '';
+                let startY = 55; // Posição padrão da tabela (reduzida)
+                const minStartY = 55; // Posição mínima da tabela
+                
+                if (comments && comments.length > 0) {
+                    // Limitar o texto a 1000 caracteres conforme solicitado
+                    const limitedComments = comments.length > 1000 ? comments.substring(0, 1000) + '...' : comments;
+                    
+                    // Usar a função splitTextToSize para calcular a altura real do texto
+                    const maxWidth = pageWidth - (2 * margin);
+                    let splitText;
+                    let totalHeight;
+                    
+                    if (typeof doc.splitTextToSize === 'function') {
+                        splitText = doc.splitTextToSize(limitedComments, maxWidth);
+                        const lineHeight = 4; // Altura de cada linha em mm
+                        totalHeight = splitText.length * lineHeight;
+                    } else {
+                        // Fallback se a função não estiver disponível
+                        const charCount = limitedComments.length;
+                        const maxCharsPerLine = 80;
+                        const linesNeeded = Math.ceil(charCount / maxCharsPerLine);
+                        const lineHeight = 4;
+                        totalHeight = linesNeeded * lineHeight;
+                        
+                        // Dividir o texto em linhas manualmente
+                        const lines = [];
+                        for (let i = 0; i < limitedComments.length; i += maxCharsPerLine) {
+                            lines.push(limitedComments.substring(i, i + maxCharsPerLine));
+                        }
+                        splitText = lines;
+                    }
+                    
+                    // Adicionar dados externos sem a legenda
+                    if (Array.isArray(splitText) && splitText.length > 1) {
+                        // Se há múltiplas linhas, usar a função que aceita array
+                        doc.text(splitText, 15, 50);
+                    } else {
+                        // Se é apenas uma linha, usar texto simples
+                        const textToDisplay = Array.isArray(splitText) ? splitText[0] : splitText;
+                        doc.text(textToDisplay, 15, 50);
+                    }
+                    
+                    // Ajustar posição da tabela baseado na altura real do texto
+                    startY = 50 + totalHeight + 10; // 10mm de espaçamento
+                    
+                    // Verificar se a posição não está muito baixa (máximo 250mm)
+                    if (startY > 250) {
+                        startY = 250;
+                    }
+                }
+                
+                // Garantir que a posição mínima seja respeitada
+                if (startY < minStartY) {
+                    startY = minStartY;
+                }
 
                 const headers = ["Qtd", "Descrição", "Unidade", "Valor Unitário", "Total"];
                 const rows = [];
 
-                document.querySelectorAll('#invoice-items tr').forEach(row => {
-                    rows.push([
-                        row.querySelector('.invoice-qty').value || '0',
-                        row.querySelector('.invoice-desc').value || '',
-                        row.querySelector('.invoice-unit').value || '',
-                        `R$ ${invoice_formatCurrency(invoice_parseCurrency(row.querySelector('.invoice-unit-price').value))}`,
-                        row.querySelector('.invoice-total').textContent || 'R$ 0,00'
-                    ]);
-                });
-
-                doc.autoTable({
-                    head: [headers],
-                    body: rows,
-                    startY: 70,
-                    margin: { left: 15, right: 15 },
-                    headStyles: {
-                        fillColor: [32,55,100],
-                        textColor: [255, 255, 255],
-                        fontStyle: 'bold'
-                    },
-                    alternateRowStyles: {
-                        fillColor: [221,235,247]
-                    },
-                    styles: {
-                        cellPadding: 3,
-                        fontSize: 10
+                const invoiceItems = document.querySelectorAll('#invoice-items tr');
+                if (invoiceItems.length === 0) {
+                    showToast("Erro: Nenhum item encontrado na tabela.", 'danger');
+                    return;
+                }
+                
+                let hasValidItems = false;
+                invoiceItems.forEach(row => {
+                    const qtyElement = row.querySelector('.invoice-qty');
+                    const descElement = row.querySelector('.invoice-desc');
+                    const unitElement = row.querySelector('.invoice-unit');
+                    const priceElement = row.querySelector('.invoice-unit-price');
+                    const totalElement = row.querySelector('.invoice-total');
+                    
+                    if (qtyElement && descElement && unitElement && priceElement && totalElement) {
+                        const qty = parseFloat(qtyElement.value) || 0;
+                        const desc = descElement.value.trim();
+                        
+                        if (qty > 0 && desc) {
+                            hasValidItems = true;
+                        }
+                        
+                        rows.push([
+                            qtyElement.value || '0',
+                            descElement.value || '',
+                            unitElement.value || '',
+                            `R$ ${invoice_formatCurrency(invoice_parseCurrency(priceElement.value))}`,
+                            totalElement.textContent || 'R$ 0,00'
+                        ]);
                     }
                 });
+                
+                if (!hasValidItems) {
+                    showToast("Erro: Adicione pelo menos um item com quantidade e descrição válidas.", 'danger');
+                    return;
+                }
 
-                const subtotal = document.getElementById('invoice-subtotal').textContent;
-                const tax = `R$ ${invoice_formatCurrency(invoice_parseCurrency(document.getElementById('invoice-tax').value))}`;
-                const discount = `R$ ${invoice_formatCurrency(invoice_parseCurrency(document.getElementById('invoice-discount').value))}`; // CORREÇÃO AQUI
-                const total = document.getElementById('invoice-total').textContent;
+                if (typeof doc.autoTable === 'function') {
+                    doc.autoTable({
+                        head: [headers],
+                        body: rows,
+                        startY: startY,
+                        margin: { left: 15, right: 15 },
+                        headStyles: {
+                            fillColor: [32,55,100],
+                            textColor: [255, 255, 255],
+                            fontStyle: 'bold'
+                        },
+                        alternateRowStyles: {
+                            fillColor: [221,235,247]
+                        },
+                        styles: {
+                            cellPadding: 3,
+                            fontSize: 10
+                        }
+                    });
+                } else {
+                    showToast("Erro: Plugin autoTable não está disponível. Recarregue a página.", 'danger');
+                    return;
+                }
 
-                let yPos = doc.lastAutoTable.finalY + 15;
+                const subtotalElement = document.getElementById('invoice-subtotal');
+                const taxElement = document.getElementById('invoice-tax');
+                const discountElement = document.getElementById('invoice-discount');
+                const totalElement = document.getElementById('invoice-total');
+                
+                if (!subtotalElement || !taxElement || !discountElement || !totalElement) {
+                    showToast("Erro: Elementos do formulário não encontrados.", 'danger');
+                    return;
+                }
+                
+                const subtotal = subtotalElement.textContent;
+                const tax = `R$ ${invoice_formatCurrency(invoice_parseCurrency(taxElement.value))}`;
+                const discount = `R$ ${invoice_formatCurrency(invoice_parseCurrency(discountElement.value))}`;
+                const total = totalElement.textContent;
+
+                let yPos = (doc.lastAutoTable && doc.lastAutoTable.finalY) ? doc.lastAutoTable.finalY + 15 : 150;
 
                 doc.setFontSize(12);
                 doc.text(`Subtotal: ${subtotal}`, 150, yPos);
@@ -2308,16 +2717,113 @@
                 doc.setFontSize(14);
                 doc.setFont(undefined, 'bold');
                 doc.text(`TOTAL: ${total}`, 150, yPos);
+                yPos += 15;
+                
+                // Adicionar dados bancários se existirem
+                const bankDataElement = document.getElementById('invoice-bank-data');
+                const bankData = bankDataElement ? bankDataElement.value.trim() : '';
+                if (bankData && bankData.length > 0) {
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('Dados Bancários:', 15, yPos);
+                    yPos += 5;
+                    if (typeof doc.splitTextToSize === 'function') {
+                        const splitBankData = doc.splitTextToSize(bankData, pageWidth - (2 * margin));
+                        doc.text(splitBankData, 15, yPos);
+                        yPos += (splitBankData.length * 4) + 10;
+                    } else {
+                        doc.text(bankData, 15, yPos);
+                        yPos += 10;
+                    }
+                }
 
-                yPos = doc.internal.pageSize.height - 20;
-                doc.setFontSize(10);
-                doc.setTextColor(100, 100, 100);
-                doc.text(" Francisco José - Setor Produtivo Florestal. Altamira-Pa.", 105, yPos, { align: 'center' });
+                // Adicionar assinatura se existir (ANTES do rodapé)
+                const signatureElement = document.getElementById('invoice-signature-name');
+                const signatureName = signatureElement ? signatureElement.value.trim() : '';
+                
+                // Sempre adicionar assinatura (imagem ou linha + nome/legenda)
+                let signatureY = doc.internal.pageSize.height - 70; // 70mm do final (mais acima)
+                
+                // Adicionar imagem da assinatura se existir
+                if (invoice_signatureDataUrl) {
+                    let signatureImg = new Image();
+                    signatureImg.src = invoice_signatureDataUrl;
+                    await new Promise(resolve => {
+                        signatureImg.onload = resolve;
+                        signatureImg.onerror = () => resolve();
+                    });
+                    
+                    const signatureWidth = 40;
+                    const signatureHeight = (signatureImg.height * signatureWidth) / signatureImg.width;
+                    const signatureX = (pageWidth - signatureWidth) / 2; // Centralizar
+                    
+                    doc.addImage(signatureImg, 'PNG', signatureX, signatureY, signatureWidth, signatureHeight);
+                    signatureY += signatureHeight + 5;
+                } else {
+                    // Se não há imagem, desenhar uma linha para assinatura centralizada
+                    doc.setLineWidth(0.5);
+                    const lineWidth = 60;
+                    const lineX = (pageWidth - lineWidth) / 2;
+                    doc.line(lineX, signatureY, lineX + lineWidth, signatureY);
+                    signatureY += 10;
+                }
+                
+                // Adicionar nome do signatário se existir (centralizado)
+                if (signatureName) {
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(signatureName, pageWidth / 2, signatureY, { align: 'center' });
+                } else {
+                    // Se não há nome, adicionar legenda "ASSINATURA" (centralizada)
+                    doc.setFontSize(10);
+                    doc.setTextColor(100, 100, 100);
+                    doc.text("ASSINATURA", pageWidth / 2, signatureY, { align: 'center' });
+                }
 
-                const fileName = `Orçamento_${invoiceNumber}_${clientName.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+                // Adicionar rodapé personalizado
+                const footerElement = document.getElementById('invoice-footer');
+                const footer = footerElement ? footerElement.value.trim() : '';
+                if (footer && footer.length > 0) {
+                    yPos = doc.internal.pageSize.height - 20;
+                    doc.setFontSize(10);
+                    doc.setTextColor(100, 100, 100);
+                    if (typeof doc.splitTextToSize === 'function') {
+                        const splitFooter = doc.splitTextToSize(footer, pageWidth - (2 * margin));
+                        const centerX = pageWidth / 2;
+                        
+                        for (let line of splitFooter) {
+                            doc.text(line, centerX, yPos, { align: 'center' });
+                            yPos += 4;
+                        }
+                    } else {
+                        const centerX = pageWidth / 2;
+                        doc.text(footer, centerX, yPos, { align: 'center' });
+                    }
+                } else {
+                    // Adicionar rodapé padrão se não há dados bancários
+                    yPos = doc.internal.pageSize.height - 20;
+                    doc.setFontSize(10);
+                    doc.setTextColor(100, 100, 100);
+                    doc.text(" Francisco José - Setor Produtivo Florestal. Altamira-Pa.", 105, yPos, { align: 'center' });
+                }
+
+                // Gerar nome do arquivo com cliente e número do orçamento
+                const cleanClientName = clientName.replace(/[^a-z0-9]/gi, '_');
+                const cleanInvoiceNumber = invoiceNumber.replace(/[^a-z0-9]/gi, '_');
+                let fileName = `Orçamento_${cleanInvoiceNumber}_${cleanClientName}.pdf`;
+                
+                if (fileName.length > 200) {
+                    fileName = `Orçamento_${cleanInvoiceNumber}_${cleanClientName.substring(0, 50)}.pdf`;
+                }
+                
                 doc.save(fileName);
-                showToast('PDF do orçamento gerado com sucesso!', 'success');
+                
+                // Verificar se o PDF foi gerado com sucesso
+                setTimeout(() => {
+                    showToast('PDF do orçamento gerado com sucesso!', 'success');
+                }, 100);
             } catch (error) {
+                console.error("Erro detalhado ao gerar PDF:", error);
                 showToast("Erro ao gerar PDF do orçamento: " + error.message, 'danger');
             }
         }
@@ -2869,7 +3375,7 @@
                     watermarkPreviewContainer.classList.remove('hidden');
                     removeWatermarkBtn.classList.remove('hidden');
                     watermarkUploadLabel.classList.add('hidden');
-                    showToast('Marca d\'água carregada!', 'success');
+                    showToast('Marca d\'água adicionada com sucesso!', 'success');
                     romaneio_saveToLocalStorage();
                 };
                 romaneio_watermarkImageElement.onerror = () => {
@@ -3371,6 +3877,11 @@
             const savedPedidos = localStorage.getItem('resumoPedidos');
             if (savedPedidos) {
                 resumoPedidos_pedidos = JSON.parse(savedPedidos);
+                // Garantir que os comentários e dados da empresa sejam preservados
+                resumoPedidos_pedidos.forEach(pedido => {
+                    if (!pedido.comentarios) pedido.comentarios = '';
+                    if (!pedido.dadosEmpresaRodape) pedido.dadosEmpresaRodape = 'Serraria Oliveira - Rodovia BR-230 - Transamazônica, s/n, Estrada São Joaquim, Bairro Liberdade, Altamira/PA';
+                });
             }
             const savedLogo = localStorage.getItem('resumoPedidosLogoDataUrl');
             if (savedLogo) {
@@ -3394,8 +3905,8 @@
             const valorUnitario = resumoPedidos_parseCurrency(document.getElementById('resumoPedidosValorUnitario').value);
             const adiantamento = resumoPedidos_parseCurrency(document.getElementById('resumoPedidosAdiantamento').value);
             const desconto = resumoPedidos_parseCurrency(document.getElementById('resumoPedidosDesconto').value);
-            const comentarios = document.getElementById('resumoPedidosComentarios').value.trim();
-            const dadosEmpresaRodape = document.getElementById('resumoPedidosDadosEmpresaRodape').value.trim();
+            const comentarios = document.getElementById('resumoPedidosComentarios').value.trim() || '';
+            const dadosEmpresaRodape = document.getElementById('resumoPedidosDadosEmpresaRodape').value.trim() || 'Serraria Oliveira - Rodovia BR-230 - Transamazônica, s/n, Estrada São Joaquim, Bairro Liberdade, Altamira/PA';
             const subtotal = parseFloat(document.getElementById('resumoPedidosSubtotalDisplay').textContent.replace(',', '.'));
             const valorTotalAPagar = parseFloat(document.getElementById('resumoPedidosValorFinal').textContent.replace(',', '.'));
 
@@ -3495,7 +4006,7 @@
             document.getElementById('resumoPedidosAdiantamento').value = resumoPedidos_formatCurrency(0);
             document.getElementById('resumoPedidosDesconto').value = resumoPedidos_formatCurrency(0);
             document.getElementById('resumoPedidosComentarios').value = '';
-            // document.getElementById('resumoPedidosDadosEmpresaRodape').value = 'Serraria Oliveira - Rodovia BR-230 - Transamazônica, s/n, Estrada São Joaquim, Bairro Liberdade, Altamira/PA';
+            // Não limpar o campo de dados da empresa para manter a consistência
             document.getElementById('resumoPedidosSubtotalDisplay').textContent = '0,00';
             document.getElementById('resumoPedidosValorFinal').textContent = '0,00';
             document.getElementById('resumoPedidosQuantidade').focus();
@@ -3526,7 +4037,7 @@
             document.getElementById('resumoPedidosValorUnitario').value = pedido.valorUnitario.toFixed(2); // Exibe o número puro para edição
             document.getElementById('resumoPedidosAdiantamento').value = pedido.adiantamento.toFixed(2);
             document.getElementById('resumoPedidosDesconto').value = pedido.desconto.toFixed(2);
-            document.getElementById('resumoPedidosComentarios').value = pedido.comentarios;
+            document.getElementById('resumoPedidosComentarios').value = pedido.comentarios || '';
             document.getElementById('resumoPedidosDadosEmpresaRodape').value = pedido.dadosEmpresaRodape || 'Serraria Oliveira - Rodovia BR-230 - Transamazônica, s/n, Estrada São Joaquim, Bairro Liberdade, Altamira/PA';
             document.getElementById('resumoPedidosSubtotalDisplay').textContent = pedido.subtotal.toFixed(2).replace('.', ',');
             document.getElementById('resumoPedidosValorFinal').textContent = pedido.valorTotalAPagar.toFixed(2).replace('.', ',');
@@ -3588,11 +4099,21 @@
             resumoPedidos_pedidos.forEach(pedido => {
                 const clientKey = pedido.nomeCliente || 'Pedidos Diversos';
                 if (!pedidosPorCliente[clientKey]) {
-                    pedidosPorCliente[clientKey] = { orders: [], comentarios: pedido.comentarios, dadosEmpresaRodape: pedido.dadosEmpresaRodape };
+                    pedidosPorCliente[clientKey] = { 
+                        orders: [], 
+                        comentarios: pedido.comentarios || '', 
+                        dadosEmpresaRodape: pedido.dadosEmpresaRodape || 'Serraria Oliveira - Rodovia BR-230 - Transamazônica, s/n, Estrada São Joaquim, Bairro Liberdade, Altamira/PA'
+                    };
                 }
                 pedidosPorCliente[clientKey].orders.push(pedido);
-                pedidosPorCliente[clientKey].comentarios = pedido.comentarios;
-                pedidosPorCliente[clientKey].dadosEmpresaRodape = pedido.dadosEmpresaRodape;
+                // Preservar comentários do primeiro pedido do cliente ou usar o mais recente
+                if (!pedidosPorCliente[clientKey].comentarios && pedido.comentarios) {
+                    pedidosPorCliente[clientKey].comentarios = pedido.comentarios;
+                }
+                // Preservar dados da empresa do primeiro pedido do cliente ou usar o mais recente
+                if (!pedidosPorCliente[clientKey].dadosEmpresaRodape && pedido.dadosEmpresaRodape) {
+                    pedidosPorCliente[clientKey].dadosEmpresaRodape = pedido.dadosEmpresaRodape;
+                }
             });
 
             const exportPdfBtn = document.getElementById('resumoPedidosExportPdf');
@@ -3726,7 +4247,7 @@
                     doc.text(`TOTAL A PAGAR: ${resumoPedidos_formatCurrency(totalAPagarGeral)}`, margin, yPos);
                     yPos += 15;
 
-                    if (clientComments) {
+                    if (clientComments && clientComments.trim()) {
                         doc.setFontSize(10);
                         doc.setFont('helvetica', 'normal');
                         doc.text('Comentários / Dados Bancários:', margin, yPos);
@@ -3753,7 +4274,7 @@
                     doc.line(margin + 20, signatureLineY, margin + 80, signatureLineY);
                     doc.text('Assinatura do Cliente', margin + 25, signatureLineY + 5);
 
-                    if (clientDadosEmpresaRodape) {
+                    if (clientDadosEmpresaRodape && clientDadosEmpresaRodape.trim()) {
                         const splitDadosEmpresa = doc.splitTextToSize(clientDadosEmpresaRodape, pageWidth - (2 * margin));
                         const centerX = pageWidth / 2;
 
